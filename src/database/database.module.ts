@@ -10,7 +10,7 @@ import { User } from '../user/user.entity';
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
         type: 'postgres',
-        url: config.get<string>('POSTGRES'),
+        url: config.get<string>('POSTGRES_URL'),
         // host: config.get<string>('DB_HOST'),
         // port: config.get<number>('DB_PORT'),
         // username: config.get<string>('DB_USERNAME'),

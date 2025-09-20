@@ -21,7 +21,7 @@ export class UsersService {
 
   // Email bo‘yicha foydalanuvchini topish
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email },select: ['id', 'email', 'password', 'emailCode', 'isEmailVerified'], });
+    return this.usersRepository.findOne({ where: { email } });
   }
 
   // Yangi foydalanuvchi yaratish

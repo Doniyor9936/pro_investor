@@ -3,12 +3,13 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiProperty } from '@nestjs/swagger';
+import { VerifyEmailDto } from './dto/verfy.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @ApiOperation({ summary: 'Ro‘yxatdan o‘tish' })
@@ -27,5 +28,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Foydalanuvchi profili (JWT bilan himoyalangan)' })
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Post('verify-user')
+  @ApiOperation({ summary: 'foydalanuvchini tasdiqlash' })
+  verify(@Body() verifyDto: VerifyEmailDto) {
+    return this.authService.verifyByEmail(verifyDto)
   }
 }

@@ -15,7 +15,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
-import express from 'express';
 import { DocumentsService } from './documents.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../user/user.entity';
@@ -23,6 +22,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import type { Response } from 'express';
+
 
 @ApiTags('documents')
 @Controller('documents')
@@ -88,7 +89,7 @@ export class DocumentsController {
   async downloadDocument(
       @GetUser() user: User,
       @Param('id', ParseIntPipe) id: number,
-      @Res() res: express.Response
+      @Res() res:Response
   ) {
       const { filePath, fileName } = await this.documentsService.getDocumentFile(id, user.id);
       

@@ -57,7 +57,7 @@ export class AuthService {
         const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
         if (!isPasswordValid) return { message: 'Email yoki parol xato' };
 
-        const token = this.jwtService.sign({ userId: user.id, email: user.email });
+        const token = this.jwtService.sign({ userId: user.id, email: user.email,role:user.role });
         return { message: 'Login muvaffaqiyatli', token };
     }
 

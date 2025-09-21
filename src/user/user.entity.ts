@@ -1,5 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Account } from 'src/accounts/account.entity';
+import { Operation } from 'src/operations/operation.entity';
+import { Document } from '../documents/document.entity';
 
 @Entity('users')
 export class User {
@@ -19,12 +22,25 @@ export class User {
     @Column()
     fullName: string;
 
-    @Column({ type: 'varchar', length: 6,nullable:true })
+    @Column({ type: 'varchar', length: 6, nullable: true })
     emailCode: string;
 
 
     @Column({ default: false })   // 👈 verify flag
     isEmailVerified: boolean;
+
+    // user.entity.ts
+    @Column({ type: 'enum', enum: ['investor', 'admin'], default: 'investor' })
+    role: string;
+
+    @OneToMany(() => Account, (account) => account.user)
+    accounts: Account[];
+
+    @OneToMany(() => Operation, (operation) => operation.user)
+    operations: Operation[];
+
+    @OneToMany(() => Document, (document) => document.user)
+    documents: Document[];
 
     @ApiProperty({ example: '2025-09-18T12:00:00Z' })
     @CreateDateColumn({ type: 'timestamp' })
@@ -34,3 +50,4 @@ export class User {
     @UpdateDateColumn({ type: 'timestamp' })
     updatedAt: Date;
 }
+

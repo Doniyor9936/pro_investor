@@ -1,0 +1,49 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { User } from '../user/user.entity';
+import { Account } from '../accounts/account.entity';
+
+@Entity('operations')
+export class Operation {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({ type: 'enum', enum: ['deposit', 'withdrawal'], })
+    type: string;
+
+    @Column({ type: 'decimal', precision: 15, scale: 2 })
+    amount: number;
+
+    @Column({ type: 'enum', enum: ['created', 'processing', 'completed', 'rejected'], default: 'created' })
+    status: string;
+
+    @Column({ type: 'text', nullable: true })
+    comment: string;
+
+    @Column({ type: 'text', nullable: true })
+    contactMethod: string; // способ связи для пополнения
+
+    @Column({ type: 'json', nullable: true })
+    withdrawalDetails: object; // реквизиты получателя для вывода
+
+    @Column({ type: 'text', nullable: true })
+    adminComment: string; // комментарий администратора
+
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
+
+    // Relations
+    @ManyToOne(() => User, (user) => user.operations)
+    user: User;
+
+    @Column()
+    userId: number;
+
+    @ManyToOne(() => Account, (account) => account.operations, { nullable: true })
+    account: Account;
+
+    @Column({ nullable: true })
+    accountId: number;
+}

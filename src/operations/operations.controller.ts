@@ -1,7 +1,88 @@
-import { Controller } from '@nestjs/common';
+import { 
+  Body, 
+  Controller, 
+  Get, 
+  Post, 
+  Param, 
+  Query, 
+  UseGuards, 
+  ParseIntPipe 
+} from '@nestjs/common';
+import { 
+  ApiTags, 
+  ApiOperation, 
+  ApiResponse, 
+  ApiBearerAuth, 
+  ApiQuery 
+} from '@nestjs/swagger';
 import { OperationsService } from './operations.service';
+import { CreateDepositDto } from './dto/create-deposit.dto';
+import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from '../user/user.entity';
+import { Operation } from './operation.entity';
 
+@ApiTags('operations')
 @Controller('operations')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class OperationsController {
-  constructor(private readonly operationsService: OperationsService) {}
+  constructor(private readonly operationsService: OperationsService,
+  
+  ) {}
+
+  @Post('deposit')
+  @ApiOperation({ summary: 'Hisobni to\'ldirish zaявкаsi yaratish' })
+  @ApiResponse({ status: 201, description: 'Zaявка yaratildi', type: Operation })
+  async createDeposit(
+      @GetUser() user: User,
+      @Body() createDepositDto: CreateDepositDto
+  ) {
+      return this.operationsService.createDeposit(user.id, createDepositDto);
+  }
+
+  @Post('withdrawal')
+  @ApiOperation({ summary: 'Pul yechish zaявкаsi yaratish' })
+  @ApiResponse({ status: 201, description: 'Zaявка yaratildi', type: Operation })
+  async createWithdrawal(
+      @GetUser() user: User,
+      @Body() createWithdrawalDto: CreateWithdrawalDto
+  ) {
+      return this.operationsService.createWithdrawal(user.id, createWithdrawalDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Mening operatsiyalarim tarixi' })
+  @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'type', required: false, enum: ['deposit', 'withdrawal'] })
+  @ApiQuery({ name: 'status', required: false, enum: ['created', 'processing', 'completed', 'rejected'] })
+  async getUserOperations(
+      @GetUser() user: User,
+      @Query('page') page: number = 1,
+      @Query('limit') limit: number = 20,
+      @Query('type') type?: string,
+      @Query('status') status?: string
+  ) {
+      return this.operationsService.getUserOperations(user.id, page, limit, type, status);
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Mening operatsiyalar statistikasi' })
+  @ApiResponse({ status: 200, description: 'Operatsiyalar statistikasi' })
+  async getUserOperationStats(@GetUser() user: User) {
+      return this.operationsService.getUserOperationStats(user.id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Operatsiya tafsilotlari' })
+  @ApiResponse({ status: 200, description: 'Operatsiya ma\'lumotlari', type: Operation })
+  async getOperationById(
+      @GetUser() user: User,
+      @Param('id', ParseIntPipe) id: number
+  ) {
+      return this.operationsService.getOperationById(id, user.id);
+  }
 }

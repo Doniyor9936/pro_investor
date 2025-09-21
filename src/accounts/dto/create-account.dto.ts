@@ -1,12 +1,9 @@
-import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAccountDto {
+  @ApiProperty({ example: 'Konservativ savdo uchun PAMM-hisob' })
+  @IsOptional()
   @IsString()
   description?: string;
-
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  @IsOptional()
-  managementFee?: number;
 }

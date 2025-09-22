@@ -2,12 +2,13 @@ import { Controller, Get, Patch, Body, Param, UseGuards, Request } from '@nestjs
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './user.service';
+import { UpdatePasswordDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth() // JWT token kerakligini bildiradi
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   // JWT guard bilan hozirgi foydalanuvchi profilini olish
   @UseGuards(JwtAuthGuard)
@@ -16,10 +17,15 @@ export class UsersController {
   async getProfile(@Request() req) {
     const user = await this.usersService.findById(req.user.userId);
     return {
-      id: user.id,
-      email: user.email,
       fullName: user.fullName,
-      createdAt: user.createdAt,
+      phone: user.phone,
+      email: user.email,
+      passport: user.passport,
+      issuedBy: user.issuedBy,
+      issuedDate: user.issuedDate,
+      code: user.code,
+      gender: user.gender,
+      birthDate: user.birthDate,
     };
   }
 
@@ -27,10 +33,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   @ApiOperation({ summary: 'Hozirgi foydalanuvchi profilini yangilash' })
-  async updateProfile(@Request() req, @Body() body: Partial<{ email: string; fullName: string }>) {
-    const user = await this.usersService.updateUser(req.user.userId, body);
+  async updateProfile(@Request() req, @Body() body: UpdatePasswordDto) {
+     await this.usersService.updateUser(req.user.userId, body);
     return {
-     message:'user muaffaqiyatli yangilandi'
+      message: 'user muaffaqiyatli yangilandi'
     };
   }
 

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiProperty, ApiBearerAuth } from '@nestjs/swagger';
 import { VerifyEmailDto } from './dto/verfy.dto';
 
 @ApiTags('Auth')
@@ -26,6 +26,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Foydalanuvchi profili (JWT bilan himoyalangan)' })
+  @ApiBearerAuth()
   getProfile(@Request() req) {
     return req.user;
   }

@@ -6,7 +6,8 @@ import {
   Post, 
   Param, 
   UseGuards, 
-  ParseIntPipe 
+  ParseIntPipe, 
+  Request
 } from '@nestjs/common';
 import { 
   ApiTags, 
@@ -21,6 +22,7 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../user/user.entity';
 import { Operation } from './operation.entity';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
+import { OperationResponseDto } from './dto/operation-response.dto';
 
 @ApiTags('operations')
 @Controller('operations')
@@ -51,10 +53,11 @@ export class OperationsController {
 
   @Get()
   @ApiOperation({ summary: 'Mening operatsiyalarim tarixi' })
-  @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati', type: [Operation] })
+  @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati', type: [OperationResponseDto] })
   async getUserOperations(@GetUser() user: User) {
       return this.operationsService.getUserOperations(user.id);
   }
+  
 
   @Get('stats')
   @ApiOperation({ summary: 'Mening operatsiyalar statistikasi' })

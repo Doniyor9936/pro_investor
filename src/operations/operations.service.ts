@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Operation } from './operation.entity';
 import { CreateDepositDto } from './dto/create-deposit.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
+import { OperationResponseDto } from './dto/operation-response.dto';
 
 @Injectable()
 export class OperationsService {
@@ -40,13 +41,17 @@ export class OperationsService {
         return this.operationsRepository.save(operation);
     }
 
-    async getUserOperations(userId: number): Promise<Operation[]> {
-        return this.operationsRepository.find({
-            where: { userId },
-            relations: ['account'],
-            order: { createdAt: 'DESC' },
-        });
-    }
+// src/operations/operations.service.ts
+async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
+    const operations = await this.operationsRepository.find({
+        where: { userId },
+        relations: ['account'],
+        order: { createdAt: 'DESC' }
+    });
+
+    return operations.map(OperationResponseDto.fromEntity);
+}
+
 
     async getOperationById(operationId: number, userId: number): Promise<Operation> {
         const operation = await this.operationsRepository.findOne({

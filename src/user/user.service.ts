@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UpdatePasswordDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
   }
 
   // Foydalanuvchi ma’lumotlarini yangilash
-  async updateUser(id: number, data: Partial<User>): Promise<User> {
+  async updateUser(id: number, data: UpdatePasswordDto): Promise<User> {
     const user = await this.findById(id); // mavjudligini tekshirish
     Object.assign(user, data);
     return this.usersRepository.save(user);

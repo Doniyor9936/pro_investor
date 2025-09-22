@@ -56,4 +56,5 @@ export class Account {
 
     @OneToMany(() => Operation, (operation) => operation.account)
     operations: Operation[];
+    number: string;
 }

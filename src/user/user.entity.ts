@@ -29,6 +29,27 @@ export class User {
     @Column({ default: false })   // 👈 verify flag
     isEmailVerified: boolean;
 
+    @Column({ type: 'varchar', length: 15, nullable: true })
+    phone: string;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    passport: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    issuedBy: string;
+
+    @Column({ type: 'date', nullable: true })
+    issuedDate: Date;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    code: string;
+
+    @Column({ type: 'enum', enum: ['М', 'Ж'], nullable: true })
+    gender: string;
+
+    @Column({ type: 'date', nullable: true })
+    birthDate: Date;
+
     // user.entity.ts
     @Column({ type: 'enum', enum: ['investor', 'admin'], default: 'investor' })
     role: string;

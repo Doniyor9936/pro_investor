@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account } from './account.entity';
 import { CreateAccountDto } from './dto/create-account.dto';
+import { AccountResponseDto } from './dto/account-response.dto';
 
 @Injectable()
 export class AccountsService {
@@ -24,25 +25,40 @@ export class AccountsService {
         return this.accountsRepository.save(account);
     }
 
-    async getUserAccounts(userId: number): Promise<Account[]> {
-        return this.accountsRepository.find({
+    async getUserAccounts(userId: number): Promise<AccountResponseDto[]> {
+        const accounts = await this.accountsRepository.find({
             where: { userId },
-            relations: ['operations'],
             order: { createdAt: 'DESC' },
         });
+    
+        return accounts.map(account => ({
+            id: account.id.toString(),
+            accountNumber: account.accountNumber,
+            currency: account.currency,
+            balance: Number(account.balance),
+            income: Number(account.profit),
+            profitPercent: Number(account.profitPercentage)
+        }));
     }
 
-    async getAccountById(id: number, userId: number): Promise<Account> {
+    async getAccountById(id: number, userId: number): Promise<AccountResponseDto> {
         const account = await this.accountsRepository.findOne({
             where: { id, userId },
-            relations: ['operations', 'user'],
+            // relations: ['operations', 'user'] - olib tashlang
         });
         
         if (!account) {
             throw new NotFoundException('Счет не найден');
         }
         
-        return account;
+        return {
+            id: account.id.toString(),
+            accountNumber: account.accountNumber,
+            currency: account.currency,
+            balance: Number(account.balance),
+            income: Number(account.profit),
+            profitPercent: Number(account.profitPercentage)
+        };
     }
 
     async updateAccountBalance(accountId: number, amount: number): Promise<Account> {

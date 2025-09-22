@@ -1,10 +1,10 @@
+// src/operations/operations.controller.ts
 import { 
   Body, 
   Controller, 
   Get, 
   Post, 
   Param, 
-  Query, 
   UseGuards, 
   ParseIntPipe 
 } from '@nestjs/common';
@@ -12,25 +12,22 @@ import {
   ApiTags, 
   ApiOperation, 
   ApiResponse, 
-  ApiBearerAuth, 
-  ApiQuery 
+  ApiBearerAuth
 } from '@nestjs/swagger';
 import { OperationsService } from './operations.service';
 import { CreateDepositDto } from './dto/create-deposit.dto';
-import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../user/user.entity';
 import { Operation } from './operation.entity';
+import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 
 @ApiTags('operations')
 @Controller('operations')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class OperationsController {
-  constructor(private readonly operationsService: OperationsService,
-  
-  ) {}
+  constructor(private readonly operationsService: OperationsService) {}
 
   @Post('deposit')
   @ApiOperation({ summary: 'Hisobni to\'ldirish zaявкаsi yaratish' })
@@ -54,19 +51,9 @@ export class OperationsController {
 
   @Get()
   @ApiOperation({ summary: 'Mening operatsiyalarim tarixi' })
-  @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'type', required: false, enum: ['deposit', 'withdrawal'] })
-  @ApiQuery({ name: 'status', required: false, enum: ['created', 'processing', 'completed', 'rejected'] })
-  async getUserOperations(
-      @GetUser() user: User,
-      @Query('page') page: number = 1,
-      @Query('limit') limit: number = 20,
-      @Query('type') type?: string,
-      @Query('status') status?: string
-  ) {
-      return this.operationsService.getUserOperations(user.id, page, limit, type, status);
+  @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati', type: [Operation] })
+  async getUserOperations(@GetUser() user: User) {
+      return this.operationsService.getUserOperations(user.id);
   }
 
   @Get('stats')

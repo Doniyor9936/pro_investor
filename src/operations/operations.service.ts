@@ -6,6 +6,7 @@ import { Operation } from './operation.entity';
 import { CreateDepositDto } from './dto/create-deposit.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 import { OperationResponseDto } from './dto/operation-response.dto';
+import { UpdateOperationStatusDto } from './dto/update-operation-status.dto';
 
 @Injectable()
 export class OperationsService {
@@ -107,10 +108,8 @@ async getAllOperations(
     };
 }
 
-async updateOperationStatus(
-    operationId: number,
-    status: string,
-    adminComment?: string
+async updateOperationStatus(operationId,
+    dto:UpdateOperationStatusDto
 ): Promise<Operation> {
     const operation = await this.operationsRepository.findOne({
         where: { id: operationId },
@@ -122,11 +121,11 @@ async updateOperationStatus(
     }
 
     const allowedStatuses = ['created', 'processing', 'completed', 'rejected'];
-    if (!allowedStatuses.includes(status)) {
+    if (!allowedStatuses.includes(dto.status)) {
         throw new BadRequestException('Notogri status');
     }
 
-    operation.status = status;
+    operation.status = dto.status;
     // adminComment field yo'q entity'da, kerak bo'lsa qo'shing
 
     return this.operationsRepository.save(operation);

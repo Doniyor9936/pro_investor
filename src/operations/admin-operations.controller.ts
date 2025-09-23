@@ -2,6 +2,7 @@ import { Body, Controller, Get, Put, Param, Query, ParseIntPipe, UseGuards } fro
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OperationsService } from '../operations/operations.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdateOperationStatusDto } from './dto/update-operation-status.dto';
 
 @ApiTags('admin-operations')
 @Controller('admin/operations')
@@ -25,9 +26,8 @@ export class AdminOperationsController {
     @ApiOperation({ summary: 'Operatsiya statusini yangilash (Admin)' })
     async updateOperationStatus(
         @Param('id', ParseIntPipe) id: number,
-        @Body('status') status: string,
-        @Body('adminComment') adminComment?: string
+        @Body() dto:UpdateOperationStatusDto
     ) {
-        return this.operationsService.updateOperationStatus(id, status, adminComment);
+        return this.operationsService.updateOperationStatus(id,dto);
     }
 }

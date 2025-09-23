@@ -1,3 +1,4 @@
+// src/accounts/account.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Operation } from '../operations/operation.entity';
@@ -10,6 +11,24 @@ export class Account {
     @Column({ unique: true })
     accountNumber: string;
 
+    @Column({ type: 'varchar', length: 3, default: 'RUB' })
+    currency: string;
+
+    @Column({ nullable: true })
+    bikOrBank: string;
+
+    @Column({ nullable: true })
+    bankName: string;
+
+    @Column({ nullable: true })
+    inn: string;
+
+    @Column({ nullable: true })
+    kpp: string;
+
+    @Column({ nullable: true })
+    corrAccount: string;
+
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
     balance: number;
 
@@ -21,9 +40,6 @@ export class Account {
 
     @Column({ type: 'enum', enum: ['active', 'suspended', 'closed'], default: 'active' })
     status: string;
-
-    @Column({ nullable: true })
-    description: string;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
@@ -40,4 +56,5 @@ export class Account {
 
     @OneToMany(() => Operation, (operation) => operation.account)
     operations: Operation[];
+    number: string;
 }

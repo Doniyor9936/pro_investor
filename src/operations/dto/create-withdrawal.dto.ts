@@ -1,36 +1,49 @@
-import { IsNumber, IsString, IsOptional, Min, IsObject } from 'class-validator';
+// src/operations/dto/create-withdrawal.dto.ts
+import { IsNumber, IsString, IsOptional, Min, IsObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
+export class WithdrawalDetailsDto {
+  @ApiProperty({ example: 'Tinkoff Bank' })
+  @IsString()
+  bankName: string;
+
+  @ApiProperty({ example: '4111111111111111' })
+  @IsString()
+  cardNumber: string;
+
+  @ApiProperty({ example: 'Иван Иванов' })
+  @IsString()
+  recipientName: string;
+}
+
 export class CreateWithdrawalDto {
-  @ApiProperty({ example: 500 })
+    @ApiProperty({ example: 1234567890 })
+    @IsNumber()
+    @Type(() => Number)
+    accountId: number;
+
+  @ApiProperty({ example: 5000 })
   @IsNumber()
   @Type(() => Number)
   @Min(1)
   amount: number;
 
-  @ApiProperty({ example: 'Foydani yechib olish' })
+  @ApiProperty({ example: 'Вывод на карту' })
   @IsOptional()
   @IsString()
   comment?: string;
 
   @ApiProperty({
+    type: WithdrawalDetailsDto,
     example: {
-      bankName: 'Kapitalbank',
-      cardNumber: '8600 1234 5678 9012',
-      recipientName: 'Ali Valiyev'
+      bankName: 'Tinkoff Bank',
+      cardNumber: '4111111111111111',
+      recipientName: 'Иван Иванов'
     }
   })
   @IsObject()
-  withdrawalDetails: {
-    bankName: string;
-    cardNumber: string;
-    recipientName: string;
-  };
-
-  @ApiProperty({ example: 1 })
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  accountId?: number;
+  @ValidateNested()
+  @Type(() => WithdrawalDetailsDto)
+  withdrawalDetails: WithdrawalDetailsDto;
 }

@@ -7,7 +7,7 @@ export class Operation {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'enum', enum: ['deposit', 'withdrawal'], })
+    @Column({ type: 'enum', enum: ['deposit', 'withdrawal', 'profit'], })
     type: string;
 
     @Column({ type: 'decimal', precision: 15, scale: 2 })
@@ -18,15 +18,6 @@ export class Operation {
 
     @Column({ type: 'text', nullable: true })
     comment: string;
-
-    @Column({ type: 'text', nullable: true })
-    contactMethod: string; // способ связи для пополнения
-
-    @Column({ type: 'json', nullable: true })
-    withdrawalDetails: object; // реквизиты получателя для вывода
-
-    @Column({ type: 'text', nullable: true })
-    adminComment: string; // комментарий администратора
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
@@ -46,4 +37,8 @@ export class Operation {
 
     @Column({ nullable: true })
     accountId: number;
+
+    @Column({ type: 'json', nullable: true })
+    withdrawalDetails: object; 
+
 }

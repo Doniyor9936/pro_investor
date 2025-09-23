@@ -6,6 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/user/user.service';
 import { MailService } from 'src/mail/mail.service';
 import { VerifyEmailDto } from './dto/verfy.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { UpdateEmailCodeDto } from 'src/user/dto/update-email-code.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,6 +71,42 @@ export class AuthService {
         if (user.emailCode !== verfyDto.code) {
             throw new UnauthorizedException("kod notogri");
         }
+
+        if (user.emailCodeExpiresAt && user.emailCodeExpiresAt < new Date()) {
+            // Kod muddati o‘tgan, yangi kod yuborish
+            await this.resendVerificationEmail({ email: user.email });
+            throw new UnauthorizedException('Kod muddati tugagan, yangi kod emailga yuborildi');
+        }
+    
+        // Email tasdiqlandi, kodni tozalash
+        await this.usersService.updateEmailCode(user.id,null,null);
+
         return { message: "Email muvaffaqiyatli tasdiqlandi" };
     }
+
+    async resendVerificationEmail(dto: ResendVerificationDto) {
+        const user = await this.usersService.findByEmail(dto.email);
+      
+        if (!user) {
+          throw new NotFoundException('Foydalanuvchi topilmadi');
+        }
+      
+        // Yangi kod yaratamiz
+        const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+      
+        // User jadvalida saqlaymiz
+        user.emailCode = newCode;
+        await this.usersService.updateEmailCode(user.id,newCode,expiresAt);
+      
+        // Email yuboramiz
+        await this.mailService.sendMail(
+          user.email,
+          'Email verification code',
+          `Tasdiqlash kodi: ${newCode}`,
+        );
+      
+        return { message: 'Tasdiqlash kodi qayta yuborildi' };
+      }
+      
 }

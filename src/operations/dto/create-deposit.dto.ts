@@ -1,5 +1,4 @@
-// src/operations/dto/create-deposit.dto.ts
-import { IsNumber, IsString, IsOptional, Min } from 'class-validator';
+import { IsNumber, IsString, IsOptional, Min, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -20,4 +19,9 @@ export class CreateDepositDto {
   @IsNumber()
   @Type(() => Number)
   accountId?: number;
+
+  @ApiProperty({ example: 'created', enum: ['created', 'processing', 'completed', 'rejected'] })
+  @IsOptional()
+  @IsEnum(['created', 'processing', 'completed', 'rejected'])
+  status?: string;
 }

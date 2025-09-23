@@ -14,6 +14,9 @@ export class AccountResponseDto {
     @ApiProperty({ example: 25000 })
     balance: number;
 
+    @ApiProperty({example:'Kapital Bank'})
+    bankName: string;
+
     @ApiProperty({ example: 3500 })
     income: number;
 

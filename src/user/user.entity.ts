@@ -23,7 +23,10 @@ export class User {
     fullName: string;
 
     @Column({ type: 'varchar', length: 6, nullable: true })
-    emailCode: string;
+    emailCode: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+  emailCodeExpiresAt?: Date | null; // Kodning amal qilish muddati
 
 
     @Column({ default: false })   // 👈 verify flag

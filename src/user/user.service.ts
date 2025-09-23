@@ -38,6 +38,14 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async updateEmailCode(userId: number, emailCode: string | null, expiresAt: Date | null): Promise<User> {
+    const user = await this.findById(userId);
+    user.emailCode = emailCode;
+    user.emailCodeExpiresAt = expiresAt;
+    return this.usersRepository.save(user);
+}
+
+
   // Foydalanuvchi o‘chirish (agar kerak bo‘lsa)
   async removeUser(id: number): Promise<void> {
     const user = await this.findById(id);

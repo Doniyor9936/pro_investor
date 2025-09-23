@@ -34,7 +34,7 @@ export class UsersController {
   @Patch('me')
   @ApiOperation({ summary: 'Hozirgi foydalanuvchi profilini yangilash' })
   async updateProfile(@Request() req, @Body() body: UpdatePasswordDto) {
-     await this.usersService.updateUser(req.user.userId, body);
+     await this.usersService.updateUser(req.user.userId,body);
     return {
       message: 'user muaffaqiyatli yangilandi'
     };

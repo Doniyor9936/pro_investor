@@ -13,13 +13,10 @@ export class AccountsService {
     ) {}
 
     async createAccount(userId: number, createAccountDto: CreateAccountDto): Promise<Account> {
-        // Генерация номера счета
-        const accountNumber = this.generateAccountNumber();
         
         const account = this.accountsRepository.create({
             ...createAccountDto,
             userId,
-            accountNumber,
         });
         
         return this.accountsRepository.save(account);
@@ -37,7 +34,8 @@ export class AccountsService {
             currency: account.currency,
             balance: Number(account.balance),
             income: Number(account.profit),
-            profitPercent: Number(account.profitPercentage)
+            profitPercent: Number(account.profitPercentage),
+            bankName:account.bankName
         }));
     }
 
@@ -57,7 +55,8 @@ export class AccountsService {
             currency: account.currency,
             balance: Number(account.balance),
             income: Number(account.profit),
-            profitPercent: Number(account.profitPercentage)
+            profitPercent: Number(account.profitPercentage),
+            bankName:account.bankName
         };
     }
 
@@ -80,11 +79,5 @@ export class AccountsService {
         account.profit = profit;
         account.profitPercentage = profitPercentage;
         return this.accountsRepository.save(account);
-    }
-
-    private generateAccountNumber(): string {
-        const timestamp = Date.now().toString();
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `PAMM${timestamp.slice(-6)}${random}`;
     }
 }

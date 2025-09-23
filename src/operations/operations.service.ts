@@ -7,15 +7,27 @@ import { CreateDepositDto } from './dto/create-deposit.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 import { OperationResponseDto } from './dto/operation-response.dto';
 import { UpdateOperationStatusDto } from './dto/update-operation-status.dto';
+import { UsersService } from 'src/user/user.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class OperationsService {
     constructor(
         @InjectRepository(Operation)
         private readonly operationsRepository: Repository<Operation>,
-    ) {}
+        private readonly usersService: UsersService,
+        private readonly mailService: MailService,
+    ) { }
+
+    private generateEmailCode(): string {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
 
     async createDeposit(userId: number, createDepositDto: CreateDepositDto): Promise<Operation> {
+
+        const emailCode = this.generateEmailCode();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
         const operation = this.operationsRepository.create({
             type: 'deposit',
             userId,
@@ -23,12 +35,26 @@ export class OperationsService {
             comment: createDepositDto.comment,
             accountId: createDepositDto.accountId,
             status: 'created',
+            emailCode,
+            emailCodeExpiresAt: expiresAt
         });
 
-        return this.operationsRepository.save(operation);
+        await this.operationsRepository.save(operation);
+
+        await this.mailService.sendMail(
+            (await this.usersService.findById(userId)).email,
+            'Operation Verification Code',
+            `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
+        );
+
+        return operation;
     }
 
     async createWithdrawal(userId: number, createWithdrawalDto: CreateWithdrawalDto): Promise<Operation> {
+
+        const emailCode = this.generateEmailCode();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
         const operation = this.operationsRepository.create({
             type: 'withdrawal',
             userId,
@@ -37,21 +63,31 @@ export class OperationsService {
             accountId: createWithdrawalDto.accountId,
             withdrawalDetails: createWithdrawalDto.withdrawalDetails,
             status: 'created',
+            emailCode,
+            emailCodeExpiresAt: expiresAt
         });
 
-        return this.operationsRepository.save(operation);
+        await this.operationsRepository.save(operation);
+
+        await this.mailService.sendMail(
+            (await this.usersService.findById(userId)).email,
+            'Operation Verification Code',
+            `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
+        );
+
+        return operation;
     }
 
-// src/operations/operations.service.ts
-async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
-    const operations = await this.operationsRepository.find({
-        where: { userId },
-        relations: ['account'],
-        order: { createdAt: 'DESC' }
-    });
+    // src/operations/operations.service.ts
+    async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
+        const operations = await this.operationsRepository.find({
+            where: { userId },
+            relations: ['account'],
+            order: { createdAt: 'DESC' }
+        });
 
-    return operations.map(OperationResponseDto.fromEntity);
-}
+        return operations.map(OperationResponseDto.fromEntity);
+    }
 
 
     async getOperationById(operationId: number, userId: number): Promise<Operation> {
@@ -69,7 +105,7 @@ async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
 
     async getUserOperationStats(userId: number) {
         const operations = await this.operationsRepository.find({ where: { userId } });
-        
+
         return {
             total: operations.length,
             deposits: operations.filter(op => op.type === 'deposit').length,
@@ -81,53 +117,53 @@ async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
     }
 
     // src/operations/operations.service.ts da qo'shing
-async getAllOperations(
-    page: number = 1,
-    limit: number = 20,
-    type?: string,
-    status?: string
-) {
-    const whereConditions: any = {};
-    
-    if (type) whereConditions.type = type;
-    if (status) whereConditions.status = status;
+    async getAllOperations(
+        page: number = 1,
+        limit: number = 20,
+        type?: string,
+        status?: string
+    ) {
+        const whereConditions: any = {};
 
-    const [operations, total] = await this.operationsRepository.findAndCount({
-        where: whereConditions,
-        relations: ['user', 'account'],
-        order: { createdAt: 'DESC' },
-        skip: (page - 1) * limit,
-        take: limit,
-    });
+        if (type) whereConditions.type = type;
+        if (status) whereConditions.status = status;
 
-    return {
-        operations,
-        total,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-    };
-}
+        const [operations, total] = await this.operationsRepository.findAndCount({
+            where: whereConditions,
+            relations: ['user', 'account'],
+            order: { createdAt: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
+        });
 
-async updateOperationStatus(operationId,
-    dto:UpdateOperationStatusDto
-): Promise<Operation> {
-    const operation = await this.operationsRepository.findOne({
-        where: { id: operationId },
-        relations: ['user'],
-    });
-
-    if (!operation) {
-        throw new NotFoundException('Operatsiya topilmadi');
+        return {
+            operations,
+            total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 
-    const allowedStatuses = ['created', 'processing', 'completed', 'rejected'];
-    if (!allowedStatuses.includes(dto.status)) {
-        throw new BadRequestException('Notogri status');
+    async updateOperationStatus(operationId,
+        dto: UpdateOperationStatusDto
+    ): Promise<Operation> {
+        const operation = await this.operationsRepository.findOne({
+            where: { id: operationId },
+            relations: ['user'],
+        });
+
+        if (!operation) {
+            throw new NotFoundException('Operatsiya topilmadi');
+        }
+
+        const allowedStatuses = ['created', 'processing', 'completed', 'rejected'];
+        if (!allowedStatuses.includes(dto.status)) {
+            throw new BadRequestException('Notogri status');
+        }
+
+        operation.status = dto.status;
+        // adminComment field yo'q entity'da, kerak bo'lsa qo'shing
+
+        return this.operationsRepository.save(operation);
     }
-
-    operation.status = dto.status;
-    // adminComment field yo'q entity'da, kerak bo'lsa qo'shing
-
-    return this.operationsRepository.save(operation);
-}
 }

@@ -39,6 +39,13 @@ export class Operation {
     accountId: number;
 
     @Column({ type: 'json', nullable: true })
-    withdrawalDetails: object; 
+    withdrawalDetails: object;
+
+    @Column({ type: 'varchar', nullable: true })
+    emailCode?: string;
+
+    @Column({ type: 'timestamp', nullable: true })
+    emailCodeExpiresAt?: Date;
+
 
 }

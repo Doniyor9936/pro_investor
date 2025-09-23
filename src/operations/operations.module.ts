@@ -7,10 +7,11 @@ import { Notification } from 'src/notifications/notification.entity';
 import { UsersModule } from 'src/user/user.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { AdminOperationsController } from './admin-operations.controller';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Operation]),NotificationsModule,UsersModule],
   controllers: [OperationsController,AdminOperationsController],
-  providers: [OperationsService],
+  providers: [OperationsService,MailService],
 })
 export class OperationsModule {}

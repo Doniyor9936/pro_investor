@@ -1,5 +1,4 @@
-// src/operations/dto/create-withdrawal.dto.ts
-import { IsNumber, IsString, IsOptional, Min, IsObject, ValidateNested } from 'class-validator';
+import { IsNumber, IsString, IsOptional, Min, IsObject, ValidateNested, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -18,10 +17,10 @@ export class WithdrawalDetailsDto {
 }
 
 export class CreateWithdrawalDto {
-    @ApiProperty({ example: 1234567890 })
-    @IsNumber()
-    @Type(() => Number)
-    accountId: number;
+  @ApiProperty({ example: 1234567890 })
+  @IsNumber()
+  @Type(() => Number)
+  accountId: number;
 
   @ApiProperty({ example: 5000 })
   @IsNumber()
@@ -46,4 +45,9 @@ export class CreateWithdrawalDto {
   @ValidateNested()
   @Type(() => WithdrawalDetailsDto)
   withdrawalDetails: WithdrawalDetailsDto;
+
+  @ApiProperty({ example: 'created', enum: ['created', 'processing', 'completed', 'rejected'] })
+  @IsOptional()
+  @IsEnum(['created', 'processing', 'completed', 'rejected'])
+  status?: string;
 }

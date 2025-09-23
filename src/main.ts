@@ -4,6 +4,16 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('pro-invertor')
@@ -14,10 +24,9 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  const PORT = process.env.APP_PORT || 3001
+  const PORT = process.env.APP_PORT || 3001;
   await app.listen(PORT, () => {
     console.log(`server running:http://localhost:${PORT}/api`);
-
   });
 }
 bootstrap();

@@ -18,14 +18,14 @@ export class UsersController {
     const user = await this.usersService.findById(req.user.userId);
     return {
       fullName: user.fullName,
-      phone: user.phone,
+      phone: user.phone ?? null,
       email: user.email,
-      passport: user.passport,
-      issuedBy: user.issuedBy,
-      issuedDate: user.issuedDate,
-      code: user.code,
-      gender: user.gender,
-      birthDate: user.birthDate,
+      passport: user.passport ?? null,
+      issuedBy: user.issuedBy ?? null,
+      issuedDate: user.issuedDate ?? null,
+      code: user.code ?? null,
+      gender: user.gender ?? null,
+      birthDate: user.birthDate ?? null,
     };
   }
 

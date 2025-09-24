@@ -70,8 +70,7 @@ export class UsersController {
     return { message: 'Foydalanuvchi roli yangilandi', user };
   }
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin') // agar admin update qilsa role ham yangilay oladi
+  @UseGuards(JwtAuthGuard)
   async updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto

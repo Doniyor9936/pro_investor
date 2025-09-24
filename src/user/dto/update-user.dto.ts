@@ -43,8 +43,4 @@ export class UpdateUserDto {
     @IsDateString()
     birthDate?: string;
 
-    @ApiProperty({ required: false, })
-    @IsOptional()
-    @IsString()
-    role?: string;
 }

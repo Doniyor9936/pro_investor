@@ -19,7 +19,7 @@ export class MailService {
     });
   }
 
-   sendMail(to: string, subject: string, text: string) {
+  async sendMail(to: string, subject: string, text: string) {
     return this.transporter.sendMail({
       from: this.configService.get<string>('SMTP_USER'),
       to,

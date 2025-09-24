@@ -13,7 +13,7 @@ export class Operation {
     @Column({ type: 'decimal', precision: 15, scale: 2 })
     amount: number;
 
-    @Column({ type: 'enum', enum: ['created', 'processing', 'completed', 'rejected'], default: 'created' })
+    @Column({ type: 'varchar', })
     status: string;
 
     @Column({ type: 'text', nullable: true })

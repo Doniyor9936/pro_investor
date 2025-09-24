@@ -39,15 +39,18 @@ export class OperationsService {
             emailCodeExpiresAt: expiresAt
         });
 
-        await this.operationsRepository.save(operation);
+        this.usersService.findById(userId)
+        .then(user => {
+            return this.mailService.sendMail(
+                user.email,
+                'Operation Verification Code',
+                `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
+            );
+        })
+        .then(() => console.log('Email jo‘natildi'))
+        .catch(err => console.error('Email yuborishda xato:', err));
 
-        await this.mailService.sendMail(
-            (await this.usersService.findById(userId)).email,
-            'Operation Verification Code',
-            `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
-        );
-
-        return operation;
+    return operation;
     }
 
     async createWithdrawal(userId: number, createWithdrawalDto: CreateWithdrawalDto): Promise<Operation> {
@@ -69,13 +72,18 @@ export class OperationsService {
 
         await this.operationsRepository.save(operation);
 
-        await this.mailService.sendMail(
-            (await this.usersService.findById(userId)).email,
-            'Operation Verification Code',
-            `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
-        );
+        this.usersService.findById(userId)
+        .then(user => {
+            return this.mailService.sendMail(
+                user.email,
+                'Operation Verification Code',
+                `Sizning operatsiyangizni tasdiqlash kodi: ${emailCode}`
+            );
+        })
+        .then(() => console.log('Email jo‘natildi'))
+        .catch(err => console.error('Email yuborishda xato:', err));
 
-        return operation;
+    return operation;
     }
 
     // src/operations/operations.service.ts

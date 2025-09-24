@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UpdatePasswordDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class UsersService {
@@ -32,9 +34,11 @@ export class UsersService {
   }
 
   // Foydalanuvchi ma’lumotlarini yangilash
-  async updateUser(id: number, data: UpdatePasswordDto): Promise<User> {
+  async updateUserPassword(id: number, data: UpdatePasswordDto): Promise<User> {
     const user = await this.findById(id); // mavjudligini tekshirish
-    Object.assign(user, data);
+    if (data.newPassword) {
+      user.password = await bcrypt.hash(data.newPassword,8)
+    }
     return this.usersRepository.save(user);
   }
 

@@ -18,7 +18,7 @@ export class OperationResponseDto {
     @ApiProperty({ example: 10000 })
     amount: number;
 
-    @ApiProperty({ example: 'completed', enum: ['pending', 'completed', 'failed', 'cancelled'] })
+    @ApiProperty({ example: 'completed', enum: ['pending', 'completed', 'failed'] })
     status: string;
 
     static fromEntity(entity: Operation): OperationResponseDto {

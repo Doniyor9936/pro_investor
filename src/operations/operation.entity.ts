@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Account } from '../accounts/account.entity';
 
@@ -27,6 +27,7 @@ export class Operation {
 
     // Relations
     @ManyToOne(() => User, (user) => user.operations)
+    @JoinColumn({ name: 'userId' }) 
     user: User;
 
     @Column()

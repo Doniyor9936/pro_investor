@@ -54,8 +54,8 @@ export class OperationsController {
   @Get()
   @ApiOperation({ summary: 'Mening operatsiyalarim tarixi' })
   @ApiResponse({ status: 200, description: 'Operatsiyalar ro\'yxati', type: [OperationResponseDto] })
-  async getUserOperations(@GetUser() user: User) {
-      return this.operationsService.getUserOperations(user.id);
+  async getUserOperations() {
+      return this.operationsService.getUserOperations();
   }
   
 

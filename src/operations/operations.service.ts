@@ -87,10 +87,9 @@ export class OperationsService {
     }
 
     // src/operations/operations.service.ts
-    async getUserOperations(userId: number): Promise<OperationResponseDto[]> {
+    async getUserOperations(): Promise<OperationResponseDto[]> {
         const operations = await this.operationsRepository.find({
-            where: { userId },
-            relations: ['account'],
+            relations: ['account','user'],
             order: { createdAt: 'DESC' }
         });
 

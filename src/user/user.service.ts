@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { UpdatePasswordDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 
 @Injectable()
@@ -69,5 +70,17 @@ export class UsersService {
 
     return user;
   }
+
+  // src/user/user.service.ts
+async updateUser(userId: number, updateData: Partial<UpdateUserDto>) {
+  const user = await this.findById(userId);
+  if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+
+  Object.assign(user, updateData);
+  await this.usersRepository.save(user)
+
+  return user;
+}
+
 
 }

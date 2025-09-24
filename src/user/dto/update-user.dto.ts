@@ -1,36 +1,50 @@
 // src/user/dto/update-user.dto.ts
-import { IsOptional, IsString, IsDate } from 'class-validator';
+import { IsOptional, IsString, IsDateString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'; // Bu import qo'shilmagan bo'lishi mumkin
 
 export class UpdateUserDto {
+    @ApiProperty({ required: false, example: 'John Doe' })
     @IsOptional()
     @IsString()
     fullName?: string;
 
+    @ApiProperty({ required: false, example: '+998901234567' })
     @IsOptional()
     @IsString()
     phone?: string;
 
+    @ApiProperty({ required: false, example: 'AB1234567' })
     @IsOptional()
     @IsString()
     passport?: string;
 
+    @ApiProperty({ required: false, example: 'Toshkent IIB' })
     @IsOptional()
     @IsString()
     issuedBy?: string;
 
+    @ApiProperty({ required: false, example: '2020-05-15' })
     @IsOptional()
-    @IsDate()
-    issuedDate?: Date;
+    @IsDateString()
+    issuedDate?: string;
 
+    @ApiProperty({ required: false,})
     @IsOptional()
     @IsString()
     gender?: string;
 
-    @IsOptional()
-    @IsDate()
-    birthDate?: Date;
-
+    @ApiProperty({ required: false, })
     @IsOptional()
     @IsString()
-    role?: string; // admin faqat shu maydonni yangilashi mumkin
+    email?: string;
+
+    @ApiProperty({ required: false, example: '1990-01-01' })
+    @IsOptional()
+    @IsDateString()
+    birthDate?: string;
+
+    @ApiProperty({ required: false, })
+    @IsOptional()
+    @IsString()
+    role?: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -72,13 +72,46 @@ export class UsersService {
   }
 
   // src/user/user.service.ts
-  async updateUser(userId: number, updateData: Partial<UpdateUserDto>) {
-    const user = await this.findById(userId);
-    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+  async updateUser(userId: number, updateData: Partial<UpdateUserDto>): Promise<User> {
+    try {
+      console.time(`updateUser-${userId}`);
+      
+      const user = await this.findById(userId);
+      if (!user) {
+        throw new NotFoundException('Foydalanuvchi topilmadi');
+      }
 
-    Object.assign(user, updateData);
-    const updateUser = await this.usersRepository.save(user)
+      console.log('User found:', user.id);
+      console.log('Update data:', updateData);
 
-    return updateUser;
+      // Email yoki telefon o'zgartirilsa, unique ekanligini tekshirish
+      if (updateData.email && updateData.email !== user.email) {
+        const existingUser = await this.usersRepository.findOne({
+          where: { email: updateData.email }
+        });
+        if (existingUser) {
+          throw new ConflictException('Bu email allaqachon ishlatilmoqda');
+        }
+      }
+
+      if (updateData.phone && updateData.phone !== user.phone) {
+        const existingUser = await this.usersRepository.findOne({
+          where: { phone: updateData.phone }
+        });
+        if (existingUser) {
+          throw new ConflictException('Bu telefon raqami allaqachon ishlatilmoqda');
+        }
+      }
+
+      // Ma'lumotlarni yangilash
+      Object.assign(user, updateData);
+      const updatedUser = await this.usersRepository.save(user);
+      
+      console.timeEnd(`updateUser-${userId}`);
+      return updatedUser;
+    } catch (error) {
+      console.error('UpdateUser error:', error);
+      throw error;
+    }
   }
 }

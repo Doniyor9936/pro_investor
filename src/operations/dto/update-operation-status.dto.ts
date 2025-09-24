@@ -5,7 +5,7 @@ import { IsString, IsOptional } from 'class-validator';
 export class UpdateOperationStatusDto {
   @ApiProperty({ 
     description: 'Operatsiya statusi',
-    example: 'approved' 
+    example: 'completed' 
   })
   @IsString()
   status: string;

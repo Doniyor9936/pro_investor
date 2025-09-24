@@ -72,15 +72,13 @@ export class UsersService {
   }
 
   // src/user/user.service.ts
-async updateUser(userId: number, updateData: Partial<UpdateUserDto>) {
-  const user = await this.findById(userId);
-  if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+  async updateUser(userId: number, updateData: Partial<UpdateUserDto>) {
+    const user = await this.findById(userId);
+    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
 
-  Object.assign(user, updateData);
-  await this.usersRepository.save(user)
+    Object.assign(user, updateData);
+    const updateUser = await this.usersRepository.save(user)
 
-  return user;
-}
-
-
+    return updateUser;
+  }
 }

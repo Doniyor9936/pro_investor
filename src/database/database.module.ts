@@ -18,10 +18,13 @@ import { User } from '../user/user.entity';
         // database: config.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 
+        poolSize: 10,                    // Connection pool
+        maxQueryExecutionTime: 5000,     // 5 soniya max query
+        connectionTimeoutMillis: 30000, 
         ssl: {
           rejectUnauthorized: false, // 🔑 Render SSL talab qiladi
         },
-        synchronize: true, // development uchun
+        synchronize: false, // development uchun
       }),
     }),
   ],

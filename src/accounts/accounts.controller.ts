@@ -42,7 +42,7 @@ export class AccountsController {
   @ApiBearerAuth()
   async getUserAccounts(@Req() req: any): Promise<AccountResponseDto[]> {
     const userId = req.user?.userId;
-    return this.accountsService.getUserAccounts(userId);
+    return this.accountsService.getUserAccounts();
   }
 
   @Get(':id')

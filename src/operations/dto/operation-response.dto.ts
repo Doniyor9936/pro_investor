@@ -18,6 +18,9 @@ export class OperationResponseDto {
     @ApiProperty({ example: 10000 })
     amount: number;
 
+    @ApiProperty({ example: 'completed', enum: ['pending', 'completed', 'failed', 'cancelled'] })
+    status: string;
+
     static fromEntity(entity: Operation): OperationResponseDto {
         const dto = new OperationResponseDto();
         dto.id = `op${entity.id}`;

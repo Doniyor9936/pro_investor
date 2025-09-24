@@ -3,6 +3,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { UpdatePasswordDto } from './dto/update-user.dto';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('Users')
 @ApiBearerAuth() // JWT token kerakligini bildiradi
@@ -26,6 +28,7 @@ export class UsersController {
       code: user.code ?? null,
       gender: user.gender ?? null,
       birthDate: user.birthDate ?? null,
+      role:user.role
     };
   }
 
@@ -54,4 +57,16 @@ export class UsersController {
       createdAt: user.createdAt,
     };
   }
+
+  @Patch(':id/role')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')  // faqat adminlar kirishi mumkin
+async updateRole(
+    @Param('id') id: number,
+    @Body('role') role?: string
+) {
+    const user = await this.usersService.updateUserRole(id, role);
+    return { message: 'Foydalanuvchi roli yangilandi', user };
+}
+
 }

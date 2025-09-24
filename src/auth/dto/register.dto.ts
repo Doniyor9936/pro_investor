@@ -23,17 +23,12 @@ export class RegisterDto {
   @ApiProperty({ 
     example: 'investor', 
     description: 'Foydalanuvchi roli', 
-    enum: ['investor', 'admin'], 
     default: 'investor' 
   })
-  @IsIn(['investor', 'admin'])
   role: string;
 
-  @ApiProperty({ 
-    example: 'М', 
-    description: 'Jinsi', 
-    enum: ['М', 'Ж'] 
+  @ApiProperty({  
+    description: 'Jinsi',
   })
-  @IsIn(['М', 'Ж'])
   gender: string;
 }

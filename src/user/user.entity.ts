@@ -47,14 +47,14 @@ export class User {
     @Column({ type: 'varchar', length: 20, nullable: true })
     code: string;
 
-    @Column({ type: 'enum', enum: ['М', 'Ж'], nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     gender: string;
 
     @Column({ type: 'date', nullable: true })
     birthDate: Date;
 
     // user.entity.ts
-    @Column({ type: 'enum', enum: ['investor', 'admin'], default: 'investor' })
+    @Column({ type: 'varchar' ,default: 'investor' })
     role: string;
 
     @OneToMany(() => Account, (account) => account.user)

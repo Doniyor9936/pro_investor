@@ -11,7 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   // ID bo‘yicha foydalanuvchini topish
   async findById(id: number): Promise<User> {
@@ -37,7 +37,7 @@ export class UsersService {
   async updateUserPassword(id: number, data: UpdatePasswordDto): Promise<User> {
     const user = await this.findById(id); // mavjudligini tekshirish
     if (data.newPassword) {
-      user.password = await bcrypt.hash(data.newPassword,8)
+      user.password = await bcrypt.hash(data.newPassword, 8)
     }
     return this.usersRepository.save(user);
   }
@@ -47,7 +47,7 @@ export class UsersService {
     user.emailCode = emailCode;
     user.emailCodeExpiresAt = expiresAt;
     return this.usersRepository.save(user);
-}
+  }
 
 
   // Foydalanuvchi o‘chirish (agar kerak bo‘lsa)
@@ -55,4 +55,19 @@ export class UsersService {
     const user = await this.findById(id);
     await this.usersRepository.remove(user);
   }
+
+  // src/user/user.service.ts
+  async updateUserRole(userId: number, role?: string) {
+    const user = await this.findById(userId);
+    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+
+    if (role != undefined) {
+      user.role = role;
+      await this.usersRepository.save(user)
+    }
+
+
+    return user;
+  }
+
 }

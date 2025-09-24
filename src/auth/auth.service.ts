@@ -7,7 +7,6 @@ import { UsersService } from 'src/user/user.service';
 import { MailService } from 'src/mail/mail.service';
 import { VerifyEmailDto } from './dto/verfy.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { UpdateEmailCodeDto } from 'src/user/dto/update-email-code.dto';
 
 @Injectable()
 export class AuthService {

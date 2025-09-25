@@ -18,6 +18,11 @@ export class UpdateUserDto {
     @IsString()
     passport?: string;
 
+    @ApiProperty({ required: false, })
+    @IsOptional()
+    @IsString()
+    code?: string;
+
     @ApiProperty({ required: false, example: 'Toshkent IIB' })
     @IsOptional()
     @IsString()

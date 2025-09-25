@@ -24,7 +24,7 @@ import { User } from '../user/user.entity';
         ssl: {
           rejectUnauthorized: false, // 🔑 Render SSL talab qiladi
         },
-        synchronize: false, // development uchun
+        synchronize: true, // development uchun
       }),
     }),
   ],

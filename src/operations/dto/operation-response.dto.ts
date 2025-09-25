@@ -21,6 +21,9 @@ export class OperationResponseDto {
     @ApiProperty({ example: 'completed', })
     status: string;
 
+    @ApiProperty({ example: '8600123456789012', description: 'Karta raqami' })
+    cardNumber?: string;
+
     static fromEntity(entity: Operation): OperationResponseDto {
         const dto = new OperationResponseDto();
         dto.id = `op${entity.id}`;
@@ -28,6 +31,9 @@ export class OperationResponseDto {
         dto.type = entity.type === 'withdrawal' ? 'withdraw' : entity.type; // withdrawal -> withdraw
         dto.account = entity.account?entity.account.number : '';// account jadvalidan raqam olish
         dto.amount = entity.type === 'withdrawal' ? -Number(entity.amount) : Number(entity.amount);
+        dto.status = entity.status; // ✅ statusni qo‘shdik
+        dto.cardNumber = entity.cardNumber ?? '';
+
         return dto;
     }
 }

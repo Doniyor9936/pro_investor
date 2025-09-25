@@ -114,4 +114,12 @@ export class UsersService {
       throw error;
     }
   }
+
+  // src/user/user.service.ts
+async getAllUsers(): Promise<User[]> {
+  return this.usersRepository.find({
+    order: { createdAt: 'DESC' },
+  });
+}
+
 }

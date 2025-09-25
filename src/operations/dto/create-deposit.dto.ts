@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional, Min, IsEnum } from 'class-validator';
+import { IsNumber, IsString, IsOptional, Min, IsEnum, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -13,6 +13,13 @@ export class CreateDepositDto {
   @IsOptional()
   @IsString()
   comment?: string;
+
+  @ApiProperty({ example: '8600123456789012', description: 'Karta raqami (16 xonali)' })
+  @IsOptional()
+  @IsString()
+  @Length(16, 16, { message: 'Karta raqami 16 xonali bo‘lishi kerak' })
+  @Matches(/^[0-9]+$/, { message: 'Karta raqami faqat raqamlardan iborat bo‘lishi kerak' })
+  cardNumber?: string;
 
   @ApiProperty({ example: 1 })
   @IsOptional()

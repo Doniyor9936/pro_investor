@@ -13,7 +13,11 @@ export class Operation {
     @Column({ type: 'decimal', precision: 15, scale: 2 })
     amount: number;
 
-    @Column({ type: 'varchar', })
+    @Column({ type: 'text',nullable:true })
+    cardNumber: string;
+
+
+    @Column({ type: 'varchar',nullable:true })
     status: string;
 
     @Column({ type: 'text', nullable: true })
@@ -27,7 +31,7 @@ export class Operation {
 
     // Relations
     @ManyToOne(() => User, (user) => user.operations)
-    @JoinColumn({ name: 'userId' }) 
+    @JoinColumn({ name: 'userId' })
     user: User;
 
     @Column()

@@ -1,11 +1,12 @@
 import { Controller, Get, Patch, Body, Param, UseGuards, Request, Put } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { UpdatePasswordDto } from './dto/update-password-user.dto';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './user.entity';
 
 @ApiTags('Users')
 @ApiBearerAuth() // JWT token kerakligini bildiradi
@@ -78,5 +79,13 @@ export class UsersController {
     const user = await this.usersService.updateUser(id, updateUserDto);
     return { message: 'Foydalanuvchi ma’lumotlari yangilandi', user };
   }
+
+  // src/user/user.controller.ts
+@Get()
+@ApiOperation({ summary: 'Barcha foydalanuvchilarni olish' })
+@ApiResponse({ status: 200, description: 'Foydalanuvchilar roʻyxati', type: [User] })
+async getAllUsers() {
+  return this.usersService.getAllUsers();
+}
 
 }

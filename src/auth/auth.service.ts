@@ -17,39 +17,36 @@ export class AuthService {
     ) { }
 
     async register(registerDto: RegisterDto) {
-        function generateEmailCode(): string {
-            return Math.floor(100000 + Math.random() * 900000).toString(); // 6 xonali raqam
-        }
-        const code = generateEmailCode();
-        console.log(code);
-        
-        const existsUser = await this.usersService.findByEmail(registerDto.email)
+        const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 xonali kod
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 daqiqa
+    
+        const existsUser = await this.usersService.findByEmail(registerDto.email);
         if (existsUser) {
-            throw new ConflictException("user allaqachon mavjud");
-
+            throw new ConflictException("Foydalanuvchi allaqachon mavjud");
         }
+    
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         const user = await this.usersService.createUser({
             ...registerDto,
             password: hashedPassword,
-            emailCode: code
-
+            emailCode: code,
+            emailCodeExpiresAt: expiresAt,
         });
-
-
+    
         try {
             await this.mailService.sendMail(
                 user.email,
                 'Ro‘yxatdan o‘tish kodi',
-                `Sizning ro‘yxatdan o‘tish kodingiz: ${code}`
+                `Sizning ro‘yxatdan o‘tish kodingiz: ${code}. Kod 5 daqiqa ichida amal qiladi.`
             );
             console.log('Emailga kod jo‘natildi:', user.email);
         } catch (error) {
             console.error('Email jo‘natishda xato:', error);
         }
-
+    
         return { message: 'Ro‘yxatdan o‘tish muvaffaqiyatli, emailga kod yuborildi' };
     }
+    
 
     async login(loginDto: LoginDto) {
         const user = await this.usersService.findByEmail(loginDto.email);

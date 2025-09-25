@@ -22,9 +22,9 @@ export class AccountsService {
         return this.accountsRepository.save(account);
     }
 
-    async getUserAccounts(): Promise<AccountResponseDto[]> {
+    async getUserAccounts(userId:number): Promise<AccountResponseDto[]> {
         const accounts = await this.accountsRepository.find({
-            // where: { userId },
+            where: { userId },
             order: { createdAt: 'DESC' },
         });
     

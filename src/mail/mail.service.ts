@@ -20,11 +20,23 @@ export class MailService {
   }
 
   async sendMail(to: string, subject: string, text: string) {
-    return this.transporter.sendMail({
-      from: this.configService.get<string>('SMTP_USER'),
-      to,
-      subject,
-      text,
-    });
+    try {
+      const result = await Promise.race([
+        this.transporter.sendMail({
+          from: this.configService.get<string>('SMTP_USER'),
+          to,
+          subject,
+          text,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('SMTP timeout: server javob bermadi')), 5000),
+        ),
+      ]);
+      return result;
+    } catch (err) {
+      console.error('Email yuborishda xato:', err.message);
+      throw err;
+    }
   }
+  
 }

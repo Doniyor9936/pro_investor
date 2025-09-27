@@ -32,6 +32,8 @@ export class AuthService {
             emailCode: code,
             emailCodeExpiresAt: expiresAt,
         });
+        console.log(code);
+        
     
         try {
             await this.mailService.sendMail(

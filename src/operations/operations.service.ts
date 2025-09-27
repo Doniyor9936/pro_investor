@@ -40,10 +40,11 @@ export class OperationsService {
       userId,
       accountId: createDepositDto.accountId,
       type: 'deposit',
-      status: createDepositDto.status ?? 'create',
+      status: createDepositDto.status,
       emailCode,
       emailCodeExpiresAt: expiresAt,
     });
+    
     // Balansni yangilash
     account.balance = +account.balance + +createDepositDto.amount;
 
@@ -112,6 +113,7 @@ export class OperationsService {
     return operation;
   }
 
+  
   // src/operations/operations.service.ts
   async getUserOperations(): Promise<OperationResponseDto[]> {
     const operations = await this.operationsRepository.find({
@@ -173,10 +175,10 @@ export class OperationsService {
     };
   }
 
-  async updateOperationStatus(operationId, dto: UpdateOperationStatusDto): Promise<Operation> {
+  async updateOperationStatus(operationId:number, dto: UpdateOperationStatusDto): Promise<Operation> {
     const operation = await this.operationsRepository.findOne({
       where: { id: operationId },
-      relations: ['user'],
+      relations: ['user','account'],
     });
 
     if (!operation) {
@@ -187,10 +189,19 @@ export class OperationsService {
     if (!allowedStatuses.includes(dto.status)) {
       throw new BadRequestException('Notogri status');
     }
-
+    if (dto.status === 'completed' && operation.status !== 'completed') {
+      const account = operation.account;
+  
+      if (operation.type === 'deposit') {
+        account.balance += operation.amount;
+      } else if (operation.type === 'withdrawal') {
+        if (account.balance < operation.amount) throw new BadRequestException('Balans yetarli emas');
+        account.balance -= operation.amount;
+      }
+  
+      await this.accoutRepository.save(account);
+    }
     operation.status = dto.status;
-    // adminComment field yo'q entity'da, kerak bo'lsa qo'shing
-
     return this.operationsRepository.save(operation);
   }
 }

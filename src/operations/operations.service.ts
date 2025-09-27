@@ -1,9 +1,5 @@
 // src/operations/operations.service.ts
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Operation } from './operation.entity';
@@ -14,39 +10,46 @@ import { UpdateOperationStatusDto } from './dto/update-operation-status.dto';
 import { UsersService } from 'src/user/user.service';
 import { MailService } from 'src/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
+import { Account } from 'src/accounts/account.entity';
 
 @Injectable()
 export class OperationsService {
   constructor(
     @InjectRepository(Operation)
     private readonly operationsRepository: Repository<Operation>,
-    private readonly usersService: UsersService,
+    @InjectRepository(Account)
+    private readonly accoutRepository: Repository<Account>,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private generateEmailCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  async createDeposit(
-    userId: number,
-    createDepositDto: CreateDepositDto,
-  ): Promise<Operation> {
+  async createDeposit(userId: number, createDepositDto: CreateDepositDto): Promise<Operation> {
     const emailCode = this.generateEmailCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const account = await this.accoutRepository.findOne({ where: { id: createDepositDto.accountId, userId } });
 
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
     const operation = this.operationsRepository.create({
-      type: 'deposit',
+      ...createDepositDto,
       userId,
-      amount: createDepositDto.amount,
-      comment: createDepositDto.comment,
       accountId: createDepositDto.accountId,
-      cardNumber: createDepositDto.cardNumber,
-      status: 'created',
+      type: 'deposit',
+      status: createDepositDto.status ?? 'create',
       emailCode,
       emailCodeExpiresAt: expiresAt,
     });
+    // Balansni yangilash
+    account.balance = +account.balance + +createDepositDto.amount;
+
+    // Transaction ishlatgan yaxshi (ikkalasini birdan saqlash uchun)
+    await this.accoutRepository.save(account);
+    await this.operationsRepository.save(operation);
 
     const adminEmail = this.configService.get<string>('admin_email');
     if (!adminEmail) {
@@ -66,12 +69,16 @@ export class OperationsService {
     return operation;
   }
 
-  async createWithdrawal(
-    userId: number,
-    createWithdrawalDto: CreateWithdrawalDto,
-  ): Promise<Operation> {
+  async createWithdrawal(userId: number, createWithdrawalDto: CreateWithdrawalDto): Promise<Operation> {
     const emailCode = this.generateEmailCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    const account = await this.accoutRepository.findOne({ where: { id: createWithdrawalDto.accountId, userId } })
+    if (!account) {
+      throw new NotFoundException("account not found");
+
+    }
+    account.balance = account.balance - createWithdrawalDto.amount
 
     const operation = this.operationsRepository.create({
       type: 'withdrawal',
@@ -84,6 +91,9 @@ export class OperationsService {
       emailCode,
       emailCodeExpiresAt: expiresAt,
     });
+
+    await this.accoutRepository.save(account);
+    await this.operationsRepository.save(operation)
 
     const adminEmail = this.configService.get<string>('admin_email');
     if (!adminEmail) {
@@ -112,10 +122,7 @@ export class OperationsService {
     return operations.map(OperationResponseDto.fromEntity);
   }
 
-  async getOperationById(
-    operationId: number,
-    userId: number,
-  ): Promise<Operation> {
+  async getOperationById(operationId: number, userId: number): Promise<Operation> {
     const operation = await this.operationsRepository.findOne({
       where: { id: operationId, userId },
       relations: ['account'],
@@ -138,20 +145,13 @@ export class OperationsService {
       deposits: operations.filter((op) => op.type === 'deposit').length,
       withdrawals: operations.filter((op) => op.type === 'withdrawal').length,
       completed: operations.filter((op) => op.status === 'completed').length,
-      pending: operations.filter((op) =>
-        ['created', 'processing'].includes(op.status),
-      ).length,
+      pending: operations.filter((op) => ['created', 'processing'].includes(op.status)).length,
       rejected: operations.filter((op) => op.status === 'rejected').length,
     };
   }
 
   // src/operations/operations.service.ts da qo'shing
-  async getAllOperations(
-    page: number = 1,
-    limit: number = 20,
-    type?: string,
-    status?: string,
-  ) {
+  async getAllOperations(page: number = 1, limit: number = 20, type?: string, status?: string) {
     const whereConditions: any = {};
 
     if (type) whereConditions.type = type;
@@ -173,10 +173,7 @@ export class OperationsService {
     };
   }
 
-  async updateOperationStatus(
-    operationId,
-    dto: UpdateOperationStatusDto,
-  ): Promise<Operation> {
+  async updateOperationStatus(operationId, dto: UpdateOperationStatusDto): Promise<Operation> {
     const operation = await this.operationsRepository.findOne({
       where: { id: operationId },
       relations: ['user'],

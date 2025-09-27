@@ -8,7 +8,8 @@ import {
     UseGuards,
     ParseIntPipe,
     Request,
-    Put
+    Put,
+    Patch
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -78,10 +79,11 @@ export class OperationsController {
         return this.operationsService.getOperationById(id, user.id);
     }
 
-    @Put('/edit/balance/:id')
-    @ApiOperation({ summary: 'balansni yangilash' })
-    @ApiResponse({ status: 200, description: 'operatsiya amalga oshdi' })
-    async updateOperationStatus(@Param('id') operationId: number, @Body() dto: UpdateOperationStatusDto) {
-        return this.operationsService.updateOperationStatus(operationId, dto)
+    @Patch(':id/status')
+    async updateStatus(
+      @Param('id', ParseIntPipe) operationId: number,
+      @Body() dto: UpdateOperationStatusDto,
+    ): Promise<Operation> {
+      return this.operationsService.updateOperationStatus(operationId, dto);
     }
 }

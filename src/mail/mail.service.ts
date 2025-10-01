@@ -1,39 +1,38 @@
 import { Injectable } from '@nestjs/common';
+import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
 
 @Injectable()
 export class MailService {
-  private resendApiKey: string;
+  private transporter: nodemailer.Transporter;
 
   constructor(private configService: ConfigService) {
-    // configdan string qaytadi
-    this.resendApiKey = this.configService.get<string>('RESEND_API_KEY') ?? '';
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // 465 -> true, 587 -> false
+      auth: {
+        user: this.configService.get<string>('SMTP_USER'), // sizning Gmail
+        pass: this.configService.get<string>('SMTP_PASS'), // App password
+      },
+    });
   }
 
   async sendMail(to: string, subject: string, text: string) {
     try {
-      const response = await axios.post(
-        'https://api.resend.com/emails',
-        {
-          from: 'Pro Investor <info@pro.com>', // Resend’da verify qilingan email bo‘lishi kerak
-          to,
-          subject,
-          text,
-          html: `<p>${text}</p>`,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${this.resendApiKey}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      const result = await this.transporter.sendMail({
+        from: `"Pro Investor" <${this.configService.get<string>('SMTP_USER')}>`, // Gmailingizdan ketadi
+        to,
+        subject,
+        text,
+        html: `<p>${text}</p>`,
+      });
 
-      console.log('✅ Email yuborildi:', response.data.id);
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ Email yuborishda xato:', error.response?.data || error.message);
+      console.log('✅ Email yuborildi:', result.messageId);
+      return result;
+    } catch (error) {
+      console.error('❌ Email yuborishda xato:', error.message);
       throw error;
     }
   }

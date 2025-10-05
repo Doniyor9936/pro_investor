@@ -5,14 +5,24 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
+    const secret = process.env.JWT_SECRET;
+    
+    if (!secret) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: secret,
     });
   }
 
   async validate(payload: any) {
-    return { id: payload.userId, userId: payload.userId, email: payload.email };
+    return { 
+      id: payload.userId, 
+      userId: payload.userId, 
+      email: payload.email 
+    };
   }
 }

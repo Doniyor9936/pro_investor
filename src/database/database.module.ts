@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from '../user/user.entity';
 
 @Module({
   imports: [
@@ -17,13 +16,6 @@ import { User } from '../user/user.entity';
         // password: config.get<string>('DB_PASSWORD'),
         // database: config.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-
-        poolSize: 10,                    // Connection pool
-        maxQueryExecutionTime: 5000,     // 5 soniya max query
-        connectionTimeoutMillis: 30000, 
-        ssl: {
-          rejectUnauthorized: false, // 🔑 Render SSL talab qiladi
-        },
         synchronize: true, // development uchun
       }),
     }),

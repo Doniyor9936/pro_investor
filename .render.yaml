@@ -3,8 +3,7 @@ services:
     name: pro-investor-api
     env: node
     plan: free
-    # Build jarayoni npx orqali nest build ishlatadi
-    buildCommand: npm install && npx nest build
+    buildCommand: npm install && npm run build
     startCommand: npm run start:prod
     envVars:
       - key: NODE_ENV

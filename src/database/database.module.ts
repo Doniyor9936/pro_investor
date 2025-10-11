@@ -16,7 +16,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         // password: config.get<string>('DB_PASSWORD'),
         // database: config.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: true, // development uchun
+        synchronize: false, // development uchun
         ssl:config.get<string>('NODE_ENV') === 'production'?{rejectUnauthorized:false}:false
       }),
     }),

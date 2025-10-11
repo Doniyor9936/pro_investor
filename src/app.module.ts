@@ -8,9 +8,10 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { UsersModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal:true}),AuthModule, UsersModule, AccountsModule, OperationsModule, DocumentsModule, NotificationsModule,DatabaseModule],
+  imports: [ConfigModule.forRoot({isGlobal:true}),MailModule,AuthModule, UsersModule, AccountsModule, OperationsModule, DocumentsModule, NotificationsModule,DatabaseModule],
   controllers: [],
   providers: [],
 })

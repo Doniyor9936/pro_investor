@@ -8,15 +8,15 @@ export class MailService {
 
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // 465 -> true, 587 -> false
+      host: this.configService.get('SMTP_HOST'),
+      port: Number(this.configService.get('SMTP_PORT')),
+      secure: true, // 465 bo‘lsa true
       auth: {
-        user: this.configService.get<string>('SMTP_USER'), // sizning Gmail
-        pass: this.configService.get<string>('SMTP_PASS'), // App password
+        user: this.configService.get('SMTP_USER'),
+        pass: this.configService.get('SMTP_PASS'),
       },
     });
+    
   }
 
   async sendMail(to: string, subject: string, text: string) {
